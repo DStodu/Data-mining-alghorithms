@@ -1,27 +1,16 @@
-/**
-2.2017
-Kernel Principal Component Analysis
-Daniel Stodulka
-daniel.stodulka.st@vsb.cz
-Eigen (http://eigen.tuxfamily.org/index.php?title=Main_Page) library used for matrix operations
-**/
-
 #include "kpca.h"
 
-Eigen::MatrixXd GetData(std::string filename)  /**  Loads data into Eigen matrix, data formated as .csv with semicolon as a separator **/
+Eigen::MatrixXd GetData(std::string filename)  /**  Loads data into Eigen matrix, data formated as .csv with semicolon as a delimiter **/
 {
-    std::ifstream file;
-
-    file.open(filename.c_str(), std::ios::in);
+    std::fstream file(filename.c_str(), std::fstream::in);
     if(!file)
     {
         std::cerr << "File not found!\n";
         exit(-1);
     }
-
     int lines = 0;
 
-    lines = std::count(std::istreambuf_iterator<char>(file),std::istreambuf_iterator<char>(), '\n');
+    lines = std::count(std::istreambuf_iterator<char>(file),std::istreambuf_iterator<char>(), '\n'); // count lines and dimension
     file.seekg(0, std::ios::beg);
 
     int dimension = 0;
@@ -52,7 +41,6 @@ Eigen::MatrixXd GetData(std::string filename)  /**  Loads data into Eigen matrix
         }
         row++;
     }
-
     if (!file.eof())
     {
         std::cerr << "Wrong file format!\n";
@@ -82,62 +70,6 @@ Eigen::MatrixXd TransformData(Eigen::MatrixXd gKernel, Eigen::MatrixXd eigenVect
 	}
     return transformed;
 }
-
-void KRepresentationVariance(Eigen::MatrixXd gKernel, double variance, std::string filename)  /** Returns new data representation, eigenvectors are selected by specified variance  **/
-{
-    if(variance > 1 || variance < 0)
-    {
-        std::cerr << "Variance > 1 or < 0!" << std::endl;
-        exit(-2);
-    }
-
-    Eigen::EigenSolver<Eigen::MatrixXd> ces;
-    ces.compute(gKernel);
-
-    Eigen::MatrixXd eigenVectors;
-    Eigen::VectorXd eigenValues;
-
-    eigenVectors = ces.eigenvectors().real();
-    eigenValues = ces.eigenvalues().real();
-
-    float sum = 0;
-
-    for(int i = 0; i < eigenValues.size(); i++)
-    {
-        sum+=std::abs(eigenValues(i));
-    }
-
-    int suggCount = 0;
-    double dVariance = 0;
-
-    for(int i = 0; i < eigenValues.size(); i++)
-    {
-        dVariance+=std::abs(eigenValues(i))/sum;
-        suggCount++;
-        if(dVariance >= variance)
-            break;
-    }
-
-    std::cout << "Number of eigenvalues with a variance of at least " << variance*100 << "% : " << suggCount << std::endl;
-
-    int components = suggCount;
-
-    Eigen::MatrixXd transformed = TransformData(gKernel,eigenVectors,components);
-
-    std::fstream file;
-    file.open(filename.c_str(),std::ios::out | std::ios::trunc);
-
-    for(int i = 0; i < transformed.rows() ; i++)
-    {
-        for(int j = 0; j < transformed.cols(); j++)
-        {
-            file << transformed(i,j) << ";";
-        }
-        file << std::endl;
-    }
-    file.close();
-}
-
 
 void KRepresentation(Eigen::MatrixXd gKernel, std::string filename)  /** Returns new data representation, number of eigenvectors is suggested based on 90% variance **/
 {
@@ -207,10 +139,10 @@ void KRepresentation(Eigen::MatrixXd gKernel, std::string filename)  /** Returns
 }
 
 
-void KRepresentationValues(Eigen::MatrixXd gKernel, int components, std::string filename)  /** Returns new data representation, number of used eigenvectors is taken from the function parameter -> user input **/
+void KRepresentationValues(Eigen::MatrixXd gKernel, int components, std::string filename)  /** Returns new data representation, number of used eigenvectors is taken from the function parameter -> user input, saves to file, ; as delimiter **/
 {
     Eigen::EigenSolver<Eigen::MatrixXd> ces;
-    ces.compute(gKernel);
+    ces.compute(gKernel);						/** eigen values solver, + eigen vector both right **/
 
     Eigen::MatrixXd eigenVectors;
     Eigen::VectorXd eigenValues;
@@ -234,7 +166,7 @@ void KRepresentationValues(Eigen::MatrixXd gKernel, int components, std::string 
     file.close();
 }
 
-Eigen::MatrixXd KRepresentationValues(Eigen::MatrixXd gKernel, int components)
+Eigen::MatrixXd KRepresentationValues(Eigen::MatrixXd gKernel, int components)   /** Returns new data representation, number of used eigenvectors is taken from the function parameter -> user input, in eigen structure **/
 {
     Eigen::EigenSolver<Eigen::MatrixXd> ces;
     ces.compute(gKernel);
@@ -249,109 +181,4 @@ Eigen::MatrixXd KRepresentationValues(Eigen::MatrixXd gKernel, int components)
     transformed = TransformData(gKernel,eigenVectors,components);
 
     return transformed;
-}
-
-Eigen::MatrixXd KRepresentation(Eigen::MatrixXd gKernel)
-{
-    Eigen::EigenSolver<Eigen::MatrixXd> ces;
-    ces.compute(gKernel);
-
-    Eigen::MatrixXd eigenVectors;
-    Eigen::VectorXd eigenValues;
-
-    eigenVectors = ces.eigenvectors().real();
-    eigenValues = ces.eigenvalues().real();
-
-    float sum = 0;
-
-    for(int i = 0; i < eigenValues.size(); i++)
-    {
-        sum+=std::abs(eigenValues(i));
-    }
-
-    float variance = 0;
-    int suggCount = 0;
-    int counter = 0;
-    int components = 0;
-
-    for(int i = 0; i < eigenValues.size(); i++)
-    {
-        variance+=std::abs(eigenValues(i))/sum;
-        suggCount++;
-        counter++;
-        if(variance >= 0.9)
-            break;
-    }
-
-    float suggPlusOne, suggPlusTwo;
-
-    suggPlusOne = eigenValues(counter)/sum;
-    suggPlusTwo = eigenValues(counter+1)/sum;
-
-    std::cout << "Suggested number of eigenvalues with a variance of at least 90% :" << suggCount << std::endl;
-    std::cout << "Another value would change the variance by: " << suggPlusOne << std::endl;
-    std::cout << "Another value would change the variance by: " << suggPlusTwo << std::endl;
-
-    std::cout << "Enter the desired number of eigenvalues: ";
-    std::cin >> components;
-
-    if(components <= 0)
-    {
-        std::cerr << "Negative or zero number of components!" << std::endl;
-        exit(-2);
-    }
-
-    Eigen::MatrixXd transformed = Eigen::MatrixXd::Zero(gKernel.rows(),components);
-    transformed = TransformData(gKernel,eigenVectors,components);
-
-    return transformed;
-}
-
-Eigen::MatrixXd KRepresentationVariance(Eigen::MatrixXd gKernel, double variance)
-{
-    if(variance > 1 || variance < 0)
-    {
-        std::cerr << "Variance > 1 or < 0!" << std::endl;
-        exit(-2);
-    }
-
-    std::vector<std::vector<double>> eVectors;
-
-    Eigen::EigenSolver<Eigen::MatrixXd> ces;
-    ces.compute(gKernel);
-
-    Eigen::MatrixXd eigenVectors;
-    Eigen::VectorXd eigenValues;
-
-    eigenVectors = ces.eigenvectors().real();
-    eigenValues = ces.eigenvalues().real();
-
-    float sum = 0;
-
-    for(int i = 0; i < eigenValues.size(); i++)
-    {
-        sum+=std::abs(eigenValues(i));
-    }
-
-    int suggCount = 0;
-    double dVariance = 0;
-
-    for(int i = 0; i < eigenValues.size(); i++)
-    {
-        dVariance+=std::abs(eigenValues(i))/sum;
-        suggCount++;
-        if(dVariance >= variance)
-            break;
-    }
-
-    std::cout << "Number of eigenvalues with a variance of at least " << variance*100 << "% : " << suggCount << std::endl;
-
-    int components = suggCount;
-
-    Eigen::MatrixXd transformed = Eigen::MatrixXd::Zero(gKernel.rows(),components);
-
-    transformed = TransformData(gKernel,eigenVectors,components);
-
-    return transformed;
-
 }

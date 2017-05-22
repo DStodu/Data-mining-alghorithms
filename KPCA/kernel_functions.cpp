@@ -1,16 +1,9 @@
-/**
-2.2017
-Kernel Principal Component Analysis
-Daniel Stodulka
-daniel.stodulka.st@vsb.cz
-Eigen (http://eigen.tuxfamily.org/index.php?title=Main_Page) library used for matrix operations
-**/
-
 #include "kernel_functions.h"
 #include <iostream>
 
-
-//zmena 1
+/** 
+It is possible to execute all kernels in a simple parallel loop, make outer for parallel - easy implementation in OpenMP for example
+**/
 
 double DotProduct(Eigen::VectorXd vec1, Eigen::VectorXd vec2)
 {
@@ -21,7 +14,6 @@ double DotProduct(Eigen::VectorXd vec1, Eigen::VectorXd vec2)
     return sum;
 }
 
-//zmena 2
 double PointDistanceSquared(Eigen::VectorXd vec1, Eigen::VectorXd vec2)
 {
     double sum = 0;
@@ -33,10 +25,24 @@ double PointDistanceSquared(Eigen::VectorXd vec1, Eigen::VectorXd vec2)
     return sum;
 }
 
-Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd gKernel, int dimensions)
+Eigen::MatrixXd MX(Eigen::MatrixXd a, Eigen::MatrixXd b)
+{
+	Eigen::MatrixXd c(a.rows(),a.rows());
+	
+	for(int i = 0; i < a.rows(); i++)
+        for(int j = 0; j < a.rows(); j++)
+            for(int k = 0; k < a.rows(); k++)
+            {
+                c(i,j) += a(i,k) * b(k,j);
+            }
+	return c;
+}
+
+Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd gKernel, int dimensions) // eigen matrix mul tends to not work sometimes... own function is used
 {
     Eigen::MatrixXd oneN = Eigen::MatrixXd::Constant(gKernel.rows(), gKernel.rows(), 1.0/dimensions);
-    Eigen::MatrixXd centeredK = gKernel - (oneN*gKernel) - (gKernel*oneN) + (oneN*gKernel)*oneN;
+	Eigen::MatrixXd centeredK = gKernel - MX(oneN,gKernel) - MX(gKernel,oneN) + MX(MX(oneN,gKernel),oneN);
+    //Eigen::MatrixXd centeredK = gKernel - (oneN*gKernel) - (gKernel*oneN) + (oneN*gKernel)*oneN;
     oneN.resize(0,0);
     gKernel.resize(0,0);
     return centeredK;

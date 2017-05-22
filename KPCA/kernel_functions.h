@@ -2,7 +2,7 @@
 2.2017
 Kernel Principal Component Analysis
 Daniel Stodulka
-daniel.stodulka.st@vsb.cz
+dstodu@gmail.com
 Eigen (http://eigen.tuxfamily.org/index.php?title=Main_Page) library used for matrix operations
 Implemented kernel function can be found here http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/#source_code
 **/
@@ -10,8 +10,6 @@ Implemented kernel function can be found here http://crsouza.com/2010/03/17/kern
 #ifndef KERNEL_FUNCTIONS_H_INCLUDED
 #define KERNEL_FUNCTIONS_H_INCLUDED
 #include <Eigen/Dense>
-
-//zmena 1
 
 /**
 
@@ -21,8 +19,7 @@ Kernel functions implementation + necessary operations
 
 double DotProduct(Eigen::VectorXd,Eigen::VectorXd);
 double PointDistanceSquared(Eigen::VectorXd,Eigen::VectorXd);
-
-//zmena 2
+Eigen::MatrixXd MX(Eigen::MatrixXd, Eigen::MatrixXd);
 
 Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd,int);
 
