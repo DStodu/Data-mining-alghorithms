@@ -110,7 +110,6 @@ void Center(float* gKernel, float* ctKernel, int kSize)
 	const float beta = 1.0f;
 
 
-
 	cudaMalloc((void**) &dFlatKernel,memSize); 
 	cudaMalloc((void**) &dFlatOneN, memSize);
 	cudaMemcpy(dFlatKernel, gKernel, memSize, cudaMemcpyHostToDevice);
@@ -146,6 +145,7 @@ void ApplyKernel(std::vector<std::vector<double>> dataArray, double alpha, doubl
 {
 
 	float* flatData;
+	
 	int kSize = dataArray.size();
 	int mSize = dataArray[0].size();
 	flatData = new float[kSize*mSize];
@@ -186,21 +186,8 @@ void ApplyKernel(std::vector<std::vector<double>> dataArray, double alpha, doubl
 		nBlocks = 65536;
 	if (nBlocks < 16)
 		nBlocks = 16;
-	
-
-	float time;
-	cudaEvent_t start, stop;
-	cudaEventCreate(&start);
-	cudaEventCreate(&stop);
-	cudaEventRecord(start, 0);
 
 	GHI_Kernel <<< nBlocks, nThreads >>> (dGKernel,dFlatData,kSize,mSize,alpha,beta);
-
-	cudaEventRecord(stop, 0);
-	cudaEventSynchronize(stop);
-	cudaEventElapsedTime(&time, start, stop);
-	printf("Kernel elapsed time:  %3.3f ms \n", time);
-
 
 	t = cudaGetLastError();
 	if (t != cudaSuccess)
@@ -213,6 +200,5 @@ void ApplyKernel(std::vector<std::vector<double>> dataArray, double alpha, doubl
 	{
 		std::cout << "Result memcpy failed!" << std::endl;
 	}
-
-	cudaDeviceReset();
+	delete [] flatData;
 }
