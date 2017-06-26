@@ -1,10 +1,6 @@
 #include "kernel_functions.h"
 #include <iostream>
 
-/** 
-It is possible to execute all kernels in a simple parallel loop, make outer for parallel - easy implementation in OpenMP for example
-**/
-
 double DotProduct(Eigen::VectorXd vec1, Eigen::VectorXd vec2)
 {
     double sum = 0;
@@ -38,11 +34,10 @@ Eigen::MatrixXd MX(Eigen::MatrixXd a, Eigen::MatrixXd b)
 	return c;
 }
 
-Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd gKernel, int dimensions) // eigen matrix mul tends to not work sometimes... own function is used
+Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd gKernel, int dimensions)
 {
     Eigen::MatrixXd oneN = Eigen::MatrixXd::Constant(gKernel.rows(), gKernel.rows(), 1.0/dimensions);
 	Eigen::MatrixXd centeredK = gKernel - MX(oneN,gKernel) - MX(gKernel,oneN) + MX(MX(oneN,gKernel),oneN);
-    //Eigen::MatrixXd centeredK = gKernel - (oneN*gKernel) - (gKernel*oneN) + (oneN*gKernel)*oneN;
     oneN.resize(0,0);
     gKernel.resize(0,0);
     return centeredK;
