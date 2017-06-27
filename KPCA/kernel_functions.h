@@ -23,6 +23,7 @@
  * Computes dot product of two vectors.
  * @param v1 vector 1
  * @param v2 vector 2
+ * @return Dot product of two vectors
  */
 
 double DotProduct(Eigen::VectorXd v1, Eigen::VectorXd v2);
@@ -32,6 +33,7 @@ double DotProduct(Eigen::VectorXd v1, Eigen::VectorXd v2);
  * Computes Squared Euclidean distance of two vectors.
  * @param v1 vector 1
  * @param v2 vector 2
+ * @return Squared Euclidean distance of two vectors/points
  */
  
 double PointDistanceSquared(Eigen::VectorXd v1, Eigen::VectorXd v2);
@@ -41,6 +43,7 @@ double PointDistanceSquared(Eigen::VectorXd v1, Eigen::VectorXd v2);
  * Computes matrix multiplication, eigen library supports this function  of course, but for some odd reason does not work.
  * @param m1 matrix 1
  * @param m2 matrix 2
+ * @return Product of matrix multiplication
  */
 
 Eigen::MatrixXd MX(Eigen::MatrixXd m1, Eigen::MatrixXd m2);
@@ -52,6 +55,7 @@ Eigen::MatrixXd MX(Eigen::MatrixXd m1, Eigen::MatrixXd m2);
  * OneN = n*n matrix, where values = 1/n, n = data dimension <br>
  * @param kernel kernel matrix to be centered
  * @param dimension data dimension
+ * @return Centered kernel matrix
  */
 
 Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd kernel,int dimension);
@@ -65,6 +69,7 @@ Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd kernel,int dimension);
  * @param  matrix data matrix
  * @param value kernel parameter - alpha, degree, etc.
  * @param center 1/0 to center kernel
+ * @return Kernel matrix
  */
 
 Eigen::MatrixXd Linear_Kernel(Eigen::MatrixXd matrix, double value, bool center);

@@ -24,6 +24,7 @@
  * Loads data into vector of vectors - matrix, accepts csv format with ; as a delimiter.
  *
  * @param filename Source data file filename
+ * @return Data/Points
  */
 
 std::vector<std::vector<double>> GetData(std::string filename);
@@ -37,6 +38,7 @@ std::vector<std::vector<double>> GetData(std::string filename);
  * @param matrix
  * @param alpha 
  * @param beta
+ * @return Kernel matrix
  */
 
 std::vector<std::vector<double>> GHI(std::vector<std::vector<double>> matrix, double alpha, double beta);

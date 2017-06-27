@@ -36,12 +36,12 @@
  * Simple grid-stride for loop, over all elements, every thread acts as a single point in computation.
  * Suited for data with low dimensionality.
  *
- * @param r result kernel matrix
  * @param a input data matrix
  * @param size data size
  * @param dim data dimension
  * @param alpha
  * @param beta
+ * @param[out] r kernel matrix
  */
 
 
@@ -69,10 +69,10 @@ __global__ void GHI_Kernel(float *r, const float* a, unsigned int size, unsigned
 /**
  * @brief Matrix substraction on CUDA
  *
- * @param r result matrix
  * @param a 
  * @param b 
  * @param size data size
+ * @param[out] r result matrix
  */
 
 __global__ void MxSubs(float* r, const float* a, const float* b, int size)
@@ -88,10 +88,10 @@ __global__ void MxSubs(float* r, const float* a, const float* b, int size)
 /**
  * @brief Matrix addition on CUDA
  *
- * @param r result matrix
  * @param a 
  * @param b 
  * @param size data size
+ * @param[out] r result matrix
  */
 
 __global__ void MxAdd(float* r, const float* a, const float* b, int size)
@@ -112,9 +112,9 @@ __global__ void MxAdd(float* r, const float* a, const float* b, int size)
  * OneN = n*n matrix, where values = 1/n, n = data dimension <br>
  * Uses cublas library for matrix multiplication.
  * 
- * @param r result matrix
  * @param a kernel matrix to center
  * @param size data size
+ * @param[out] r result matrix
  */
 
 void Center(float* r,float* a, int size);

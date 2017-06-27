@@ -32,6 +32,7 @@
  *
  * Loads data into eigen matrix structure, accepts csv format with ; as a delimiter.
  * @param Source data file filename
+ * @return Data/points
  */
 Eigen::MatrixXd GetData(std::string filename);
 
@@ -41,6 +42,7 @@ Eigen::MatrixXd GetData(std::string filename);
  * @param kernel Kernel matrix
  * @param vectors Eigenvectors
  * @param components number of vectors to be used
+ * @return Transformed data
  */
 
 Eigen::MatrixXd TransformData(Eigen::MatrixXd kernel, Eigen::MatrixXd vectors, int components);
@@ -60,7 +62,7 @@ void KRepresentationValues(Eigen::MatrixXd kernel, int components, std::string f
  *
  * @param kernel Kernel matrix
  * @param components number of vectors to be used
- * 
+ * @return New data representation 
  */
 
 Eigen::MatrixXd KRepresentationValues(Eigen::MatrixXd kernel, int components);

@@ -1,3 +1,26 @@
+/*! \mainpage DBScan
+ * Implementation of DBScan.<br>
+ * Testing data various sizes and dimensions. <br>
+ * Using STL containers, not that effective as speed goes, but surely does the job and is pretty straight forward.<br>
+ * 
+ */
+
+/**
+ * @file dbscan.cpp
+ *
+ * @author Daniel Stodulka, dstodu@gmail.com
+ *
+ * @date 2016
+ *
+ * @brief DBSCAN
+ *
+ * Implemented using STL containers.<br>
+ * Consist of loading data (csv with a ;), finding neighbours within epsilon range and expanding.<br>
+ * Since no centroids are used, distance matrix is used to store distances between points.<br>
+ * 
+ * 
+ * @see https://en.wikipedia.org/wiki/DBSCAN#Algorithm
+ */
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -11,14 +34,63 @@
 
 using namespace std;
 
-float Distance(std::vector<int>, std::vector<int>);
-std::vector<std::vector<float >> GetDistanceMatrix(std::vector<std::vector<int>>);
-std::vector<std::vector<std::vector<int>>> DBScan(std::vector<std::vector<int>>,float,int);
-std::vector<int> GetNeighbours(std::vector<std::vector<float >>,float,int);
+/**
+ * @brief Euclidian distance
+ *
+ * 
+ * @param v1 vector1
+ * @param v2 vector2
+ * @return Euclidian distance
+ */
+
+float Distance(std::vector<int> v1, std::vector<int> v2);
+
+/**
+ * @brief Creates distance matrix
+ *
+ * Matrix of distances between points
+ * @param table points to be clustered
+ * @return Distance matrix
+ */	
+
+std::vector<std::vector<float >> GetDistanceMatrix(std::vector<std::vector<int>> table);
+
+
+/**
+ * @brief DBSCAN
+ *
+ * Performs DBSCAN 
+ * @param table points to be clustered
+ * @param epsilon neighborhood range
+ * @param minPT minimum number of points (within eps) to form a cluster
+ * @return Clusters of points
+ */	
+
+std::vector<std::vector<std::vector<int>>> DBScan(std::vector<std::vector<int>> table, float epsilon,int minPT);
+
+/**
+ * @brief Neighbours of a given point
+ *
+ * Gets all the neighbours in neighborhood range given by epsilon
+ * @param distanceMatrix Distance Matrix
+ * @param epsilon neighborhood range
+ * @param minPT minimum number of points (within eps) to form a cluster
+ * @return Vector of neighbour indexes
+ */	
+std::vector<int> GetNeighbours(std::vector<std::vector<float>> distanceMatrix, float eps, int i);
+
+/**
+ * @brief Sample DBSCAN usage
+ *
+ * DBSCAN usage with data loading and outputs number of points in every cluster
+ *
+ * @return status code
+ */	
+
 
 int main()
 {
-    std::vector < std::vector <int> > table;
+    std::vector<std::vector <int>> table;
 
     fstream file;
     int value;
@@ -65,25 +137,11 @@ int main()
 
     file.close();
 
-    //file.open("output.csv", ios::out | ios::trunc);
-
-    //for(unsigned int i = 0; i < clusters.size(); i++) /** OUTPUT FOR CLUSTERWIZ **/
-   /* {
-             for(unsigned int j = 0; j < clusters[i].size(); j++)
-             {
-                 for(unsigned int k = 0; k < clusters[i][j].size(); k++)
-                 {
-                     file << clusters[i][j].at(k) << ";";
-                 }
-                 file << i << std::endl;
-             }
-     }*/
-
     return 0;
 }
 
 
-float Distance(std::vector<int > a, std::vector<int> b)      /** KEEP THEM AT ARM'S LENGHT LEL **/
+float Distance(std::vector<int > a, std::vector<int> b)     
 {
     float distance = 0;
     unsigned int vSize = a.size();
@@ -106,8 +164,6 @@ std::vector<std::vector<float>> GetDistanceMatrix(std::vector<std::vector<int>> 
 
     for(unsigned int i = 0; i < mSize; i++)
     {
-        if(i%200 == 0)
-            std::cout << i << std::endl;
         adjMatrix[i].resize(tSize);
         for(unsigned int j = 0; j < mSize; j++)
         {
@@ -122,21 +178,6 @@ std::vector<std::vector<std::vector<int>>> DBScan(std::vector<std::vector<int>> 
     std::vector<std::vector<std::vector<int>>> clusters;                     /** FINAL CLUSTERS **/
     std::vector<std::vector<float>> adjMatrix = GetDistanceMatrix(table);      /** DISTANCE MATRIX **/
 
-    /*fstream file;
-    file.open("distance.csv", ios::out | ios::trunc);
-    std::cout << "writing to a file\n";
-    for(unsigned int i = 0; i < adjMatrix.size(); i++)
-    {
-        //std::cout << i << std::endl;
-        for(unsigned int j = 0; j < adjMatrix[i].size(); j++)
-        {
-            file << adjMatrix[i][j] << " ";
-        }
-        file << std::endl;
-    }
-
-    file.close();*/
-
     std::cout << "data done!\n";
 
     std::vector<int> neighbours;                                              /** NEI INDEXES **/
@@ -149,14 +190,13 @@ std::vector<std::vector<std::vector<int>>> DBScan(std::vector<std::vector<int>> 
     for(unsigned int i = 0; i < tSize; i++)
     {
         std::vector<int> foo;                                   /** ONE CLUSTER INDEXES **/
-        //std::cout << i << std::endl;
 
         if(visited[i].first)
             continue;
 
         visited[i].first = true;                                 /** VISITED? GET NEI **/
         neighbours = GetNeighbours(adjMatrix,eps,i);
-        //std::cout << neighbours.size() << std::endl;
+
         if(neighbours.size() < (unsigned)minPts)                    /** NOISE? **/
             visited[i].second = true;
 
@@ -185,7 +225,6 @@ std::vector<std::vector<std::vector<int>>> DBScan(std::vector<std::vector<int>> 
                             neighbours.push_back(neighbours2[k]);                                /** PUSH THE BASTARD **/
                     }
                 }
-               // std::cout << neighbours.size() << std::endl;
             }
 
             /** Add p' to cluster if not already in one **/
