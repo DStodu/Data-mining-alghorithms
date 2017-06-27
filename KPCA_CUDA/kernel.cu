@@ -1,23 +1,26 @@
-/*
-
-KPCA Daniel Stodulka
-
-DISCLAIMER
-Haven't found sufficient eigen library - CULA not free (dense eigensolver), cuSOLVER too complicated for my taste - no snipets/examples available, to sum it up no eigen vectors!
-
-
-KPCA - read data - two examples provided - famous iris data set, variation on swissroll
-kernel application - generalized histogram intersection kernel - proved to be quite efficient when dealing with pictures/similar data
-kernel center - to achieve zero mean across matrix elements - cublas for matrix mult
-all matrices flattened to 1D, 1D grids
+/*! \mainpage KPCA CUDA
+ * Kernel function implementation on CUDA<br>
+ * Haven't found sufficient eigen library - CULA not free (dense eigensolver), cuSOLVER too complicated for my taste - no snipets/examples available.<br>
+ * Generalized Histogram Intersection kernel is used. <br>
+ * 
+ * Tuned for gtm525m - 2 sms, 1536 threads per sm, 8 blocks per sm - 192 threads per block with minimum of 16 blocks for full occupancy. 
+ * 
+ */
 
 
-tuned for gtm525m - 2 sms, 1536 threads per sm, 8 blocks per sm - 192 threads per block with minimum of 16 blocks for full occupancy 
-
-*/
-
-
-
+/**
+ * @file kernel.cu
+ *
+ * @author Daniel Stodulka, dstodu@gmail.com
+ *
+ * @date 2017
+ *
+ * @brief Basic KPCA functions, loading data, eigen decomposition
+ *
+ * Kernel implementation on CUDA, eigen decomposition is not included, one kernel function - Generalized Histogram Intersection kernel.<br>
+ * 
+ * @see http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/
+ */
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
@@ -25,16 +28,25 @@ tuned for gtm525m - 2 sms, 1536 threads per sm, 8 blocks per sm - 192 threads pe
 #include "func.h"
 #include <stdio.h>
 
-__global__ void GHI_Kernel(float *r, const float* a, unsigned int size, unsigned int dim, int alfa, int beta)
+/**
+ * @brief GHI on CUDA kernel
+ *
+ * Computes kernel on CUDA.<br> 
+ * Matrices flattened to 1D<br>
+ * Simple grid-stride for loop, over all elements, every thread acts as a single point in computation.
+ * Suited for data with low dimensionality.
+ *
+ * @param r result kernel matrix
+ * @param a input data matrix
+ * @param size data size
+ * @param dim data dimension
+ * @param alpha
+ * @param beta
+ */
+
+
+__global__ void GHI_Kernel(float *r, const float* a, unsigned int size, unsigned int dim, int alpha, int beta)
 {
-
-	/*
-	 flat matrix 
-	 suited for data with low dimensionality
-	 every thread performs one step in ghi kernel - loops over all other points, sum of min from every "column"
-	 num of rows in matrix = num of threads
-	*/
-
 	int i = (threadIdx.x + blockDim.x*blockIdx.x)*dim;
 	
 	int gridSize = gridDim.x*blockDim.x*dim;
@@ -54,7 +66,16 @@ __global__ void GHI_Kernel(float *r, const float* a, unsigned int size, unsigned
 	}
 }
 
-__global__ void MxSubs(float* r, const float* a, const float* b, int size) // matrix sub and add
+/**
+ * @brief Matrix substraction on CUDA
+ *
+ * @param r result matrix
+ * @param a 
+ * @param b 
+ * @param size data size
+ */
+
+__global__ void MxSubs(float* r, const float* a, const float* b, int size)
 {
 	int i = threadIdx.x + blockDim.x*blockIdx.x;
 	while (i < size*size)
@@ -63,6 +84,15 @@ __global__ void MxSubs(float* r, const float* a, const float* b, int size) // ma
 		i += gridDim.x*blockDim.x;
 	}
 }
+
+/**
+ * @brief Matrix addition on CUDA
+ *
+ * @param r result matrix
+ * @param a 
+ * @param b 
+ * @param size data size
+ */
 
 __global__ void MxAdd(float* r, const float* a, const float* b, int size)
 {
@@ -75,8 +105,39 @@ __global__ void MxAdd(float* r, const float* a, const float* b, int size)
 }
 
 
-void Center(float*,float*,int);
-void ApplyKernel(std::vector<std::vector<double>>,double,double,float*);
+/**
+ * @brief Kernel matrix centering
+ * Center kernel matrix, to make it zero sum of elements, centered around the origin. <br>
+ * Ck = Kernel - OneN*Kernel - KernelOneN - OneNKernelOneN <br>
+ * OneN = n*n matrix, where values = 1/n, n = data dimension <br>
+ * Uses cublas library for matrix multiplication.
+ * 
+ * @param r result matrix
+ * @param a kernel matrix to center
+ * @param size data size
+ */
+
+void Center(float* r,float* a, int size);
+
+/**
+ * @brief Applies kernel function on data
+ *
+ * Flattens input data, allocates space on device and applies kernel function.
+ *
+ * @param data data matrix
+ * @param alpha 
+ * @param beta 
+ * @param r result matrix
+ */
+
+void ApplyKernel(std::vector<std::vector<double>> data,double alpha,double beta, float* r);
+
+/**
+ * @brief GHI kernel example usage
+ *
+ *	Loads data, performs GHI kernel and also kernel centering.
+ *
+ */
 
 int main()
 {
@@ -95,11 +156,6 @@ int main()
 
 void Center(float* gKernel, float* ctKernel, int kSize)
 {
-	/*** centering kernel - zero sum of elements in kernel matrix ***/
-	// ctKernel = gKernel - (OneG) - (gOne) + (OneGone) 
-	// gKernel/G/g = kernel matrix
-	// One = n*n matrix, values = 1/n
-
 	float* flatOneN = new float[kSize*kSize];
 	
 	std::fill(flatOneN,flatOneN+kSize*kSize, 1.0 / kSize);
@@ -115,14 +171,13 @@ void Center(float* gKernel, float* ctKernel, int kSize)
 	cudaMemcpy(dFlatKernel, gKernel, memSize, cudaMemcpyHostToDevice);
 	cudaMemcpy(dFlatOneN, flatOneN, memSize, cudaMemcpyHostToDevice);
 
-	cudaMalloc((void**) &dOneG, memSize); // results
+	cudaMalloc((void**) &dOneG, memSize);
 	cudaMalloc((void**) &dGOne, memSize);
 	cudaMalloc((void**) &dOneGOne, memSize);
 
 	cublasHandle_t handle;
 	cublasCreate(&handle);
 
-	//cublas matrix mx
 	cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, kSize, kSize, kSize, &alpha, dFlatKernel, kSize, dFlatOneN, kSize, &beta , dOneG,kSize);
 	cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, kSize, kSize, kSize, &alpha, dFlatOneN, kSize, dFlatKernel, kSize, &beta, dGOne, kSize);
 	cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, kSize, kSize, kSize, &alpha, dFlatOneN, kSize, dOneG, kSize, &beta, dOneGOne, kSize);
@@ -140,6 +195,7 @@ void Center(float* gKernel, float* ctKernel, int kSize)
 
 	cudaMemcpy(ctKernel,dFlatKernel,kSize*kSize,cudaMemcpyDeviceToHost);
 }
+
 
 void ApplyKernel(std::vector<std::vector<double>> dataArray, double alpha, double beta, float* kernel)
 {
