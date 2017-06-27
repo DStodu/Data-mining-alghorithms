@@ -1,3 +1,9 @@
+/*! \mainpage KPCA
+ * Implementation of Kernel Principal Component Analysis as described in Dimensionality reduction a comparative review.<br>
+ * Eigen library is used for datastructres and eigen decomposition.
+ * 
+ */
+
 /**
  * @file kpca.h
  *
@@ -6,9 +12,6 @@
  * @date 2016
  *
  * @brief Basic KPCA functions, loading data, eigen decomposition
- *
- * Implementation of Kernel Principal Component Analysis as described in Dimensionality reduction a comparative review.<br>
- * Eigen library is used for datastructres and eigen decomposition.
  *  
  * @see http://eigen.tuxfamily.org/index.php?title=Main_Page
  * @see https://lvdmaaten.github.io/publications/papers/TR_Dimensionality_Reduction_Review_2009.pdf
@@ -28,7 +31,7 @@
  * @brief Loading data into eigen matrix structure
  *
  * Loads data into eigen matrix structure, accepts csv format with ; as a delimiter.
- * @param filename Source data file filename
+ * @param Source data file filename
  */
 Eigen::MatrixXd GetData(std::string filename);
 

@@ -10,7 +10,7 @@
  * 17 Kernel functions implemented + necessary operations, eigen library used for matrix structures. <br>
  * It is possible to execute all kernels in a simple parallel loop, make outer for parallel - easy implementation in OpenMP for example.
  * 
- * @see http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/#source_code
+ * @see http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/
  * @see http://eigen.tuxfamily.org/index.php?title=Main_Page
  */
 
@@ -47,7 +47,7 @@ Eigen::MatrixXd MX(Eigen::MatrixXd m1, Eigen::MatrixXd m2);
 
 /**
  * @brief Centering kernel
- * Center kernel matrix, to make it zero mean, centered around the origin. <br>
+ * Center kernel matrix, to make it zero sum of elements, centered around the origin. <br>
  * Ck = Kernel - OneN*Kernel - KernelOneN - OneNKernelOneN <br>
  * OneN = n*n matrix, where values = 1/n, n = data dimension <br>
  * @param kernel kernel matrix to be centered
@@ -62,7 +62,7 @@ Eigen::MatrixXd Center_Kernel(Eigen::MatrixXd kernel,int dimension);
  * Every function is different, some of them belong to the similar group. <br>
  * Choosing the right kernel is essential for correct decomposition. <br>
  * Tuning parameters is a very tedious work and can consume vast amount of time. <br>
- * @param matrix data matrix
+ * @param  matrix data matrix
  * @param value kernel parameter - alpha, degree, etc.
  * @param center 1/0 to center kernel
  */
