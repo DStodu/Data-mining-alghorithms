@@ -1,0 +1,57 @@
+﻿<Window x:Class="RayGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RayGUI"
+        mc:Ignorable="d"
+        Title="Ray Tracer" Height="400" Width="1200">
+    <Grid RenderTransformOrigin="10,10">
+        <Label x:Name="canLabel" Content="Canvas Size" HorizontalAlignment="Left" Margin="61,34,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="camLabel" Content="Camera" HorizontalAlignment="Left" Margin="64,65,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="ligLabel" Content="Lights" HorizontalAlignment="Left" Margin="64,96,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="plLabel" Content="Plane" HorizontalAlignment="Left" Margin="64,213,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="trLabel" Content="Triangle" HorizontalAlignment="Left" Margin="64,151,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="sphLabel" Content="Sphere" HorizontalAlignment="Left" Margin="64,182,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="rLabel" Content="Set -> Add -> Render" HorizontalAlignment="Left" Margin="228,10,0,0" VerticalAlignment="Top"/>
+
+        <TextBox x:Name="canvasTBox" HorizontalAlignment="Left" Height="23" Margin="138,37,0,0" TextWrapping="Wrap" Text="400;400" VerticalAlignment="Top" Width="85"/>
+
+        <TextBox x:Name="camPointTBox" HorizontalAlignment="Left" Height="23" Margin="138,68,0,0" TextWrapping="Wrap" Text="0;-1;9" VerticalAlignment="Top" Width="85"/>
+        <TextBox x:Name="camVectorTBox" HorizontalAlignment="Left" Height="23" Margin="228,68,0,0" TextWrapping="Wrap" Text="0;1;5" VerticalAlignment="Top" Width="85"/>
+
+        <TextBox x:Name="lightPointTBox" HorizontalAlignment="Left" Height="23" Margin="138,99,0,0" TextWrapping="Wrap" Text="0;0;0" VerticalAlignment="Top" Width="85"/>
+
+        <TextBox x:Name="trianglePointTBox" HorizontalAlignment="Left" Height="23" Margin="138,154,0,0" TextWrapping="Wrap" Text="-8;3;-15" VerticalAlignment="Top" Width="85"/>
+        <TextBox x:Name="trianglePointTBox2" HorizontalAlignment="Left" Height="23" Margin="228,155,0,0" TextWrapping="Wrap" Text="-3;4;-1" VerticalAlignment="Top" Width="85"/>
+        <TextBox x:Name="trianglePointTBox3" HorizontalAlignment="Left" Height="23" Margin="318,155,0,0" TextWrapping="Wrap" Text="-5;2;-30" VerticalAlignment="Top" Width="85"/>
+
+        <TextBox x:Name="spherePointTBox" HorizontalAlignment="Left" Height="23" Margin="138,185,0,0" TextWrapping="Wrap" Text="2;5;-8" VerticalAlignment="Top" Width="85"/>
+        <TextBox x:Name="spehreRadiusTBox" HorizontalAlignment="Left" Height="23" Margin="228,186,0,0" TextWrapping="Wrap" Text="2" VerticalAlignment="Top" Width="85"/>
+
+        <TextBox x:Name="planePointTBox" HorizontalAlignment="Left" Height="23" Margin="138,216,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="85"/>
+        <TextBox x:Name="planeVectorTBox" HorizontalAlignment="Left" Height="23" Margin="228,216,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="85"/>
+
+        <Button x:Name="bLightAdd" Content="Add" HorizontalAlignment="Left" Margin="286,100,0,0" VerticalAlignment="Top" Width="75" Click="bLightAdd_Click"/>
+        <Button x:Name="bSphereAdd" Content="Add" HorizontalAlignment="Left" Margin="376,186,0,0" VerticalAlignment="Top" Width="75" Click="bSphereAdd_Click"/>
+        <Button x:Name="bPlaneAdd" Content="Add" HorizontalAlignment="Left" Margin="376,216,0,0" VerticalAlignment="Top" Width="75" Click="bPlaneAdd_Click"/>
+        <Button x:Name="bTriangleAdd" Content="Add" HorizontalAlignment="Left" Margin="466,156,0,0" VerticalAlignment="Top" Width="75" Click="bTriangleAdd_Click"/>
+
+        <ComboBox x:Name="lightCombo" HorizontalAlignment="Left" Margin="228,100,0,0" VerticalAlignment="Top" Width="53"/>
+        <ComboBox x:Name="triangleCombo" HorizontalAlignment="Left" Margin="408,156,0,0" VerticalAlignment="Top" Width="53"/>
+        <ComboBox x:Name="sphereCombo" HorizontalAlignment="Left" Margin="318,186,0,0" VerticalAlignment="Top" Width="53"/>
+        <ComboBox x:Name="planeCombo" HorizontalAlignment="Left" Margin="318,216,0,0" VerticalAlignment="Top" Width="53"/>
+
+        <Button x:Name="bSet" Content="Set" HorizontalAlignment="Left" Margin="190,276,0,0" VerticalAlignment="Top" Width="70" Click="bSet_Click"/>
+        <Image x:Name="rImg" HorizontalAlignment="Left" Height="100" Margin="706,68,0,0" VerticalAlignment="Top" Width="100"/>
+
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="525,43,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="79" Width="152"/>
+        
+        
+        <Button x:Name="bRender" Content="Render" HorizontalAlignment="Left" Margin="286,276,0,0" VerticalAlignment="Top" Width="75" Click="bRender_Click"/>
+
+
+
+
+    </Grid>
+</Window>

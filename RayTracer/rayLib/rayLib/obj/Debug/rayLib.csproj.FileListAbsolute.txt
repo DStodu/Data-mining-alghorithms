@@ -1,0 +1,5 @@
+C:\Users\ABCD\Desktop\work\rayLib\rayLib\bin\Debug\rayLib.dll
+C:\Users\ABCD\Desktop\work\rayLib\rayLib\bin\Debug\rayLib.pdb
+C:\Users\ABCD\Desktop\work\rayLib\rayLib\obj\Debug\rayLib.dll
+C:\Users\ABCD\Desktop\work\rayLib\rayLib\obj\Debug\rayLib.pdb
+C:\Users\ABCD\Desktop\work\rayLib\rayLib\obj\Debug\rayLib.csprojResolveAssemblyReference.cache
